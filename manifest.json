@@ -342,5 +342,41 @@
     "icon": "",
     "type": "global",
     "category": "18+ movie"
+  },
+  {
+    "display_name": "PornMike",
+    "value": "pornmike",
+    "version": "1.0",
+    "icon": "",
+    "type": "global",
+    "category": "18+ movie",
+    "disabled": false
+  },
+  {
+    "display_name": "WatchPorn",
+    "value": "watchporn",
+    "version": "1.0",
+    "icon": "",
+    "type": "global",
+    "category": "18+ movie",
+    "disabled": false
+  },
+  {
+    "display_name": "Neporn",
+    "value": "neporn",
+    "version": "1.0",
+    "icon": "",
+    "type": "global",
+    "category": "18+ movie",
+    "disabled": false
+  },
+  {
+    "display_name": "KissJav",
+    "value": "kissjav",
+    "version": "1.0",
+    "icon": "",
+    "type": "global",
+    "category": "18+ movie",
+    "disabled": false
   }
 ]
