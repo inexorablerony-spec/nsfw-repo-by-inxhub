@@ -20,26 +20,22 @@ export const getMeta = async function ({
     const title = $("h1, .video-title").first().text().trim() || $("title").text().replace(/\s*\|.*/i, "").trim() || "Untitled";
     const image = $('meta[property="og:image"]').attr("content") || "";
 
-    const iframeUrl = $("div.single-video iframe, iframe").first().attr("src") || "";
+    const iframeUrl = $("iframe").first().attr("src") || "";
     const directLinks: any[] = [];
 
-    // xiaoshenke direct links from iframe pattern /player/<id>/<flag> or /video/<id>/<flag>
     const m = iframeUrl.match(/\/(?:video|player)\/([^/]+)\/(\d+)/);
     if (m) {
       const reversedId = m[1].split("").reverse().join("");
       const flag = parseInt(m[2], 10);
-      const qualities = [
-        [1, "360p"],
-        [2, "480p"],
-        [4, "720p"],
-        [8, "1080p"],
-      ].filter(([bit]) => (flag & (bit as number)) !== 0);
-      for (const [bit, q] of qualities) {
-        directLinks.push({
-          title: q,
-          link: `https://xiaoshenke.net/vid/${reversedId}/${bit}`,
-          type: "mp4",
-        });
+      const map: [number, string, number][] = [[1, "360p", 360], [2, "480p", 480], [4, "720p", 720], [8, "1080p", 1080]];
+      for (const [bit, label, q] of map) {
+        if (flag & bit) {
+          directLinks.push({
+            title: label,
+            link: `https://xiaoshenke.net/vid/${reversedId}/${q}`,
+            type: "mp4",
+          });
+        }
       }
     }
 
