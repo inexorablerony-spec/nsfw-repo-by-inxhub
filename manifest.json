@@ -299,7 +299,7 @@
     "display_name": "PornTrex",
     "value": "porntrex",
     "version": "1.0",
-    "icon": "",
+    "icon": "https://www.porntrex.com/favicon.ico",
     "type": "global",
     "category": "18+ movie"
   },
@@ -307,7 +307,7 @@
     "display_name": "xHamster",
     "value": "xhamster",
     "version": "1.0",
-    "icon": "",
+    "icon": "https://static.xhpingcdn.com/xh-desktop/images/favicon/favicon-v2-180x180.png",
     "type": "global",
     "category": "18+ movie"
   },
@@ -315,7 +315,7 @@
     "display_name": "FpoXxx",
     "value": "fpoxxx",
     "version": "1.0",
-    "icon": "",
+    "icon": "https://www.fpoxxx.com/favicon.ico",
     "type": "global",
     "category": "18+ movie"
   },
@@ -347,7 +347,7 @@
     "display_name": "PornMike",
     "value": "pornmike",
     "version": "1.0",
-    "icon": "",
+    "icon": "https://www.pornmike.com/favicon.ico",
     "type": "global",
     "category": "18+ movie",
     "disabled": false
@@ -356,7 +356,7 @@
     "display_name": "WatchPorn",
     "value": "watchporn",
     "version": "1.0",
-    "icon": "",
+    "icon": "https://www.watchporn.to/favicon.ico",
     "type": "global",
     "category": "18+ movie",
     "disabled": false
@@ -365,7 +365,7 @@
     "display_name": "Neporn",
     "value": "neporn",
     "version": "1.0",
-    "icon": "",
+    "icon": "https://www.neporn.com/favicon.ico",
     "type": "global",
     "category": "18+ movie",
     "disabled": false
@@ -374,7 +374,7 @@
     "display_name": "KissJav",
     "value": "kissjav",
     "version": "1.0",
-    "icon": "",
+    "icon": "https://kissjav.com/favicon.ico",
     "type": "global",
     "category": "18+ movie",
     "disabled": false
