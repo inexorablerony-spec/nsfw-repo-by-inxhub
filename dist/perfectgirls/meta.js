@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getMeta = void 0;
 const getMeta = function (_a) {
     return __awaiter(this, arguments, void 0, function* ({ link, providerContext }) {
-        var _b, _c, _d;
         const empty = { title: "", synopsis: "", image: "", imdbId: "", type: "movie", linkList: [] };
         try {
             const { axios, cheerio } = providerContext;
@@ -21,32 +20,29 @@ const getMeta = function (_a) {
             const $ = cheerio.load(html);
             const title = $("h1").first().text().trim() || $("title").text().trim() || "Untitled";
             const image = $('meta[property="og:image"]').attr("content") || "";
-            const directLinks = [];
+            const links = [];
             const seen = new Set();
-            const videoUrl = (_b = html.match(/video_url:\s*'([^']+)'/)) === null || _b === void 0 ? void 0 : _b[1];
-            const videoQuality = ((_c = html.match(/video_url_text:\s*'([^']+)'/)) === null || _c === void 0 ? void 0 : _c[1]) || "HD";
-            if (videoUrl && !videoUrl.includes("preview")) {
-                seen.add(videoQuality);
-                directLinks.push({ title: videoQuality, link: videoUrl.replace(/&amp;/g, "&"), type: "mp4" });
+            // get_file pattern
+            const gf = html.match(/https?:\/\/[^"'\s]*get_file[^"'\s]*\.mp4[^"'\s]*/gi) || [];
+            for (const u of gf) {
+                const clean = u.replace(/&amp;/g, "&");
+                if (seen.has(clean))
+                    continue;
+                seen.add(clean);
+                links.push({ title: "Play", quality: "auto", directLinks: [{ title: "MP4", link: clean, type: "movie" }] });
             }
-            if (directLinks.length === 0) {
-                const mp4s = html.match(/https?:\/\/[^"'\s]+\.mp4[^"'\s]*/gi) || [];
-                for (const u of mp4s.slice(0, 3)) {
-                    const clean = u.replace(/&amp;/g, "&");
-                    if (clean.includes("preview") || clean.includes("thumb") || seen.has(clean))
-                        continue;
-                    seen.add(clean);
-                    const qMatch = clean.match(/_(\d+p)\.mp4/i);
-                    directLinks.push({ title: qMatch ? qMatch[1] : "HD", link: clean, type: "mp4" });
-                }
+            // generic mp4
+            const mp4 = html.match(/https?:\/\/[^"'\s]+\.mp4[^"'\s]*/gi) || [];
+            for (const u of mp4.slice(0, 3)) {
+                const clean = u.replace(/&amp;/g, "&");
+                if (seen.has(clean) || /thumb|preview|sprite/i.test(clean))
+                    continue;
+                seen.add(clean);
+                links.push({ title: "Play", quality: "auto", directLinks: [{ title: "MP4", link: clean, type: "movie" }] });
             }
-            const linkList = [];
-            if (directLinks.length > 0) {
-                linkList.push({ title: "Play", quality: ((_d = directLinks[0]) === null || _d === void 0 ? void 0 : _d.title) || "HD", directLinks });
-            }
-            return { title, synopsis: "", image, imdbId: "", type: "movie", linkList };
+            return { title, synopsis: "", image, imdbId: "", type: "movie", linkList: links };
         }
-        catch (_e) {
+        catch (_b) {
             return empty;
         }
     });
