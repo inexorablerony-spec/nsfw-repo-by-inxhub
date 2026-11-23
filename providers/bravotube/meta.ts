@@ -3,7 +3,7 @@ export const getMeta = async function ({ link, providerContext }: any): Promise<
   const empty: Info = { title: "Untitled", synopsis: "", image: "", imdbId: "", type: "movie", linkList: [] };
   try {
     const { axios, cheerio } = providerContext;
-    const res = await axios.get(link, { headers: { "User-Agent": "Mozilla/5.0", Referer: "https://www.bravotube.net/" }, timeout: 25000 });
+    const res = await axios.get(link, { headers: { "User-Agent": "Mozilla/5.0", Referer: "https://bravotube.tv/" }, timeout: 25000 });
     const html = String(res.data || "");
     const $ = cheerio.load(html);
     const title = $("h1").first().text().trim() || "Untitled";
