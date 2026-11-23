@@ -1,6 +1,7 @@
 import { Post, ProviderContext } from "../types";
 const BASE = "https://hellporno.com";
-const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36";
+const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+
 function parse(html: string, cheerio: any): Post[] {
   const $ = cheerio.load(html || "");
   const posts: Post[] = [];
@@ -13,11 +14,13 @@ function parse(html: string, cheerio: any): Post[] {
     seen.add(link);
     const title = $(el).attr("title") || $(el).find("img").attr("alt") || "Video";
     let image = $(el).find("img").attr("data-src") || $(el).find("img").attr("src") || "";
-    if (image.startsWith("/")) image = BASE + image;
+    if (image.startsWith("//")) image = "https:" + image;
+    else if (image.startsWith("/")) image = BASE + image;
     if (title.length > 2) posts.push({ title: title.slice(0, 160), link, image });
   });
   return posts.slice(0, 40);
 }
+
 export const getPosts = async function ({ page, signal, providerContext }: any): Promise<Post[]> {
   try {
     const { axios, cheerio } = providerContext;
@@ -26,7 +29,8 @@ export const getPosts = async function ({ page, signal, providerContext }: any):
     return parse(res.data, cheerio);
   } catch { return []; }
 };
-export const getSearchPosts = async function ({ searchQuery, page, signal, providerContext }: any): Promise<Post[]> {
+
+export const getSearchPosts = async function ({ searchQuery, signal, providerContext }: any): Promise<Post[]> {
   try {
     const { axios, cheerio } = providerContext;
     const q = encodeURIComponent(searchQuery).replace(/%20/g, "-");
