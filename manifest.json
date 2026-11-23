@@ -36,28 +36,10 @@
     "disabled": false
   },
   {
-    "display_name": "PornHat",
-    "value": "pornhat",
-    "version": "1.0",
-    "icon": "https://www.pornhat.com/favicon.ico",
-    "type": "global",
-    "category": "18+ movie",
-    "disabled": false
-  },
-  {
     "display_name": "AlphaPorno",
     "value": "alphaporno",
     "version": "1.0",
     "icon": "https://www.alphaporno.com/favicon.ico",
-    "type": "global",
-    "category": "18+ movie",
-    "disabled": false
-  },
-  {
-    "display_name": "PerfectGirls",
-    "value": "perfectgirls",
-    "version": "1.0",
-    "icon": "https://www.perfectgirls.net/favicon.ico",
     "type": "global",
     "category": "18+ movie",
     "disabled": false
@@ -99,28 +81,10 @@
     "disabled": false
   },
   {
-    "display_name": "HellPorno",
-    "value": "hellporno",
-    "version": "1.0",
-    "icon": "https://hellporno.com/favicon.ico",
-    "type": "global",
-    "category": "18+ movie",
-    "disabled": false
-  },
-  {
     "display_name": "AlotPorn",
     "value": "alotporn",
     "version": "1.0",
     "icon": "https://www.alotporn.com/favicon.ico",
-    "type": "global",
-    "category": "18+ movie",
-    "disabled": false
-  },
-  {
-    "display_name": "BravoTube",
-    "value": "bravotube",
-    "version": "1.0",
-    "icon": "https://bravotube.net/favicon.ico",
     "type": "global",
     "category": "18+ movie",
     "disabled": false
