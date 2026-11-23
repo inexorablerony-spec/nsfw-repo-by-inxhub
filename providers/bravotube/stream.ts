@@ -1,5 +1,5 @@
-import { Stream } from "../types";
-export const getStream = async function ({ link }: { link: string }): Promise<Stream[]> {
+import { Stream, ProviderContext } from "../types";
+export const getStream = async function ({ link }: any): Promise<Stream[]> {
   if (!link) return [];
-  return [{ server: "bravotube", link: link.replace(/&amp;/g, "&"), type: "mp4", headers: { Referer: "https://bravotube.net/", "User-Agent": "Mozilla/5.0" } }];
+  return [{ server: "BravoTube", link, type: link.includes(".m3u8") ? "m3u8" : "mp4", headers: { Referer: "https://www.bravotube.net/" } }];
 };
