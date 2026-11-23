@@ -1,53 +1,58 @@
-// @vega-provider spankbang
-// @vega-version 1.0
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getSearchPosts = exports.getPosts = void 0;
-const getPosts = async function ({ page = 1, signal, providerContext }) {
-  try {
-    const { axios, cheerio } = providerContext;
-    const BASE = "https://spankbang.com";
-    const res = await axios.get(BASE + "/?page=" + page, { headers: { "User-Agent": "Mozilla/5.0", "Referer": BASE + "/" }, signal, timeout: 20000 });
-    const $ = cheerio.load(res.data || "");
+const BASE = "https://spankbang.com";
+const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+function parse(html, cheerio) {
+    const $ = cheerio.load(html || "");
     const posts = [];
     const seen = new Set();
-    $("a[href]").each((_, el) => {
-      let href = $(el).attr("href") || "";
-      const match = href.match(/^\/?([a-z0-9]+)\/video(?:\/([^?#]+))?/i);
-      if (!match) return;
-      const link = BASE + "/" + match[1] + "/video/" + (match[2] || "");
-      if (seen.has(link)) return;
-      seen.add(link);
-      const title = $(el).attr("title") || $(el).find("img").attr("alt") || $(el).text().trim();
-      let image = $(el).find("img").attr("data-src") || $(el).find("img").attr("src") || "";
-      if (image.startsWith("//")) image = "https:" + image;
-      if (title && title.length > 2) posts.push({ title, link, image });
+    // Try multiple selectors
+    $("a[href*='/video/'], div.video-item a, .thumb a").each((_, el) => {
+        let link = ($(el).attr("href") || "").split("?")[0];
+        if (!link)
+            return;
+        if (link.startsWith("/"))
+            link = BASE + link;
+        if (!link.includes("spankbang.com") || !link.includes("/video/"))
+            return;
+        if (seen.has(link))
+            return;
+        seen.add(link);
+        const title = $(el).attr("title") || $(el).find("img").attr("alt") || $(el).text().trim() || "Video";
+        let image = $(el).find("img").attr("data-src") || $(el).find("img").attr("src") || "";
+        if (image.startsWith("//"))
+            image = "https:" + image;
+        else if (image.startsWith("/"))
+            image = BASE + image;
+        if (image.includes("data:image") || image.includes("blank"))
+            image = "";
+        if (title.length > 2)
+            posts.push({ title: title.slice(0, 160), link, image });
     });
     return posts.slice(0, 40);
-  } catch { return []; }
+}
+const getPosts = async function ({ page, signal, providerContext }) {
+    try {
+        const { axios, cheerio } = providerContext;
+        const url = page > 1 ? `${BASE}/?page=${page}` : BASE + "/";
+        const res = await axios.get(url, { headers: { "User-Agent": UA, Referer: BASE + "/" }, signal, timeout: 25000 });
+        return parse(res.data, cheerio);
+    }
+    catch (_a) {
+        return [];
+    }
 };
 exports.getPosts = getPosts;
-const getSearchPosts = async function ({ searchQuery, page = 1, signal, providerContext }) {
-  try {
-    const { axios, cheerio } = providerContext;
-    const BASE = "https://spankbang.com";
-    const res = await axios.get(BASE + "/s/" + encodeURIComponent(searchQuery) + "/?page=" + page, { headers: { "User-Agent": "Mozilla/5.0", "Referer": BASE + "/" }, signal, timeout: 20000 });
-    const $ = cheerio.load(res.data || "");
-    const posts = [];
-    const seen = new Set();
-    $("a[href]").each((_, el) => {
-      let href = $(el).attr("href") || "";
-      const match = href.match(/^\/?([a-z0-9]+)\/video(?:\/([^?#]+))?/i);
-      if (!match) return;
-      const link = BASE + "/" + match[1] + "/video/" + (match[2] || "");
-      if (seen.has(link)) return;
-      seen.add(link);
-      const title = $(el).attr("title") || $(el).find("img").attr("alt") || $(el).text().trim();
-      let image = $(el).find("img").attr("data-src") || $(el).find("img").attr("src") || "";
-      if (image.startsWith("//")) image = "https:" + image;
-      if (title) posts.push({ title, link, image });
-    });
-    return posts.slice(0, 40);
-  } catch { return []; }
+const getSearchPosts = async function ({ searchQuery, page, signal, providerContext }) {
+    try {
+        const { axios, cheerio } = providerContext;
+        const url = `${BASE}/s/${encodeURIComponent(searchQuery)}/?page=${page || 1}`;
+        const res = await axios.get(url, { headers: { "User-Agent": UA, Referer: BASE + "/" }, signal, timeout: 25000 });
+        return parse(res.data, cheerio);
+    }
+    catch (_a) {
+        return [];
+    }
 };
 exports.getSearchPosts = getSearchPosts;
