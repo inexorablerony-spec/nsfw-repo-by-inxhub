@@ -18,15 +18,28 @@ export const getStream = async function ({
     Referer: "https://xiaoshenke.net/",
   };
 
-  // If it's a xiaoshenke redirect, follow it to the final CDN URL
   if (link.includes("xiaoshenke.net")) {
     try {
-      const res = await axios.get(link, { headers, maxRedirects: 5, signal, timeout: 15000, validateStatus: () => true });
-      const finalUrl = res.request?.res?.responseUrl || res.config?.url || link;
-      if (finalUrl && finalUrl !== link && finalUrl.startsWith("http")) {
-        return [{ server: "FullPorner", link: finalUrl, type: "mp4", headers }];
+      // Manual redirect follow to get the final video URL
+      let current = link;
+      for (let i = 0; i < 5; i++) {
+        const res = await axios.get(current, {
+          headers,
+          maxRedirects: 0,
+          signal,
+          timeout: 10000,
+          validateStatus: (s: number) => s >= 200 && s < 400,
+        });
+        const loc = res.headers?.location || res.headers?.Location;
+        if (!loc) break;
+        current = loc.startsWith("//") ? "https:" + loc : loc.startsWith("/") ? "https://xiaoshenke.net" + loc : loc;
+        if (current.includes("/s0/") || current.includes(".mp4")) break;
+      }
+      if (current !== link) {
+        return [{ server: "FullPorner", link: current, type: "mp4", headers }];
       }
     } catch {}
+    // Fallback: return original and let player handle redirect
     return [{ server: "FullPorner", link, type: "mp4", headers }];
   }
 
