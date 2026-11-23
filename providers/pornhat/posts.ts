@@ -14,7 +14,8 @@ function parse(html: string, cheerio: any): Post[] {
     seen.add(link);
     const title = $a.attr("title") || $(el).find("img").attr("alt") || "Video";
     let image = $(el).find("img").attr("data-src") || $(el).find("img").attr("src") || "";
-    if (image.startsWith("/")) image = BASE + image;
+    if (image.startsWith("//")) image = "https:" + image;
+    else if (image.startsWith("/")) image = BASE + image;
     if (title.length > 2) posts.push({ title: title.slice(0, 160), link, image });
   });
   return posts.slice(0, 40);
