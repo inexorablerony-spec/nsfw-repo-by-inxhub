@@ -4,6 +4,6 @@ exports.getStream = void 0;
 const getStream = async function ({ link }) {
     if (!link)
         return [];
-    return [{ server: "SpankBang", link, type: link.includes(".m3u8") ? "m3u8" : "mp4", headers: { Referer: "https://spankbang.com/" } }];
+    return [{ server: "SpankBang", link, type: link.includes(".m3u8") ? "m3u8" : "mp4", headers: { Referer: "https://spankbang.com/", Cookie: "country=US" } }];
 };
 exports.getStream = getStream;

@@ -7,12 +7,11 @@ function parse(html: string, cheerio: any): Post[] {
   const posts: Post[] = [];
   const seen = new Set<string>();
 
-  // Try multiple selectors
-  $("a[href*='/video/'], div.video-item a, .thumb a").each((_: any, el: any) => {
+  $("a[href*='/video/']").each((_: any, el: any) => {
     let link = ($(el).attr("href") || "").split("?")[0];
     if (!link) return;
     if (link.startsWith("/")) link = BASE + link;
-    if (!link.includes("spankbang.com") || !link.includes("/video/")) return;
+    if (!link.includes("/video/")) return;
     if (seen.has(link)) return;
     seen.add(link);
 
@@ -32,7 +31,11 @@ export const getPosts = async function ({ page, signal, providerContext }: any):
   try {
     const { axios, cheerio } = providerContext;
     const url = page > 1 ? `${BASE}/?page=${page}` : BASE + "/";
-    const res = await axios.get(url, { headers: { "User-Agent": UA, Referer: BASE + "/" }, signal, timeout: 25000 });
+    const res = await axios.get(url, {
+      headers: { "User-Agent": UA, Referer: BASE + "/", Cookie: "country=US" },
+      signal,
+      timeout: 25000,
+    });
     return parse(res.data, cheerio);
   } catch { return []; }
 };
@@ -41,7 +44,11 @@ export const getSearchPosts = async function ({ searchQuery, page, signal, provi
   try {
     const { axios, cheerio } = providerContext;
     const url = `${BASE}/s/${encodeURIComponent(searchQuery)}/?page=${page || 1}`;
-    const res = await axios.get(url, { headers: { "User-Agent": UA, Referer: BASE + "/" }, signal, timeout: 25000 });
+    const res = await axios.get(url, {
+      headers: { "User-Agent": UA, Referer: BASE + "/", Cookie: "country=US" },
+      signal,
+      timeout: 25000,
+    });
     return parse(res.data, cheerio);
   } catch { return []; }
 };
