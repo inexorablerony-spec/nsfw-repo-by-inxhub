@@ -1,5 +1,5 @@
 import { Stream } from "../types";
-export const getStream = async function ({ link }: { link: string }): Promise<Stream[]> {
+export const getStream = async function ({ link }: any): Promise<Stream[]> {
   if (!link) return [];
-  return [{ server: "hellporno", link: link.replace(/&amp;/g, "&"), type: "mp4", headers: { Referer: "https://hellporno.com/", "User-Agent": "Mozilla/5.0" } }];
+  return [{ server: "HellPorno", link, type: link.includes(".m3u8") ? "m3u8" : "mp4", headers: { Referer: "https://hellporno.com/" } }];
 };
