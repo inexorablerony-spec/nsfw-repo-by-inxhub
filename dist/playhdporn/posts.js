@@ -1,71 +1,56 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPosts = getPosts;
-exports.getSearchPosts = getSearchPosts;
+exports.getSearchPosts = exports.getPosts = void 0;
 const BASE = "https://playhdporn.com";
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36";
-function parseHtml(html, cheerio) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const $ = cheerio.load(html || "");
-        const posts = [];
-        const seen = new Set();
-        $("a[href*='/video/']").each((_, el) => {
-            var _a;
-            const $el = $(el);
-            const link = $el.attr("href");
-            if (!link || !link.includes("/video/") || seen.has(link))
-                return;
-            const fullLink = link.startsWith("http") ? link : BASE + link;
-            seen.add(fullLink);
-            const title = $el.attr("title") || $el.find("img").attr("alt") || $el.text().trim() || "Video";
-            let image = $el.find("img").attr("src") || $el.find("img").attr("data-src") || "";
-            if (image && image.startsWith("//"))
-                image = "https:" + image;
-            if (image && image.startsWith("/"))
-                image = BASE + image;
-            if (!image) {
-                const videoId = (_a = link.match(/\/video\/([^/]+)/)) === null || _a === void 0 ? void 0 : _a[1];
-                if (videoId)
-                    image = `${BASE}/contents/videos_screenshots/25000/${videoId}/320x180/1.jpg`;
-            }
-            if (title)
-                posts.push({ title, link: fullLink, image });
-        });
-        return posts.slice(0, 30);
+function parse(html, cheerio) {
+    const $ = cheerio.load(html || "");
+    const posts = [];
+    const seen = new Set();
+    $("a.drop-card, a[href*='/video/']").each((_, el) => {
+        const $el = $(el);
+        let link = ($el.attr("href") || "").split("?")[0];
+        if (!link || !link.includes("/video/"))
+            return;
+        if (link.startsWith("/"))
+            link = BASE + link;
+        if (seen.has(link))
+            return;
+        seen.add(link);
+        const title = $el.attr("title") || $el.find("img").attr("alt") || $el.text().trim() || "Video";
+        let image = $el.find("img").attr("data-original") || $el.find("img").attr("data-src") || $el.find("img").attr("src") || "";
+        if (image.startsWith("//"))
+            image = "https:" + image;
+        else if (image.startsWith("/"))
+            image = BASE + image;
+        if (image.includes("data:image") || image.includes("blank") || image.includes("gif"))
+            image = "";
+        if (title.length > 2)
+            posts.push({ title: title.slice(0, 160), link, image });
     });
+    return posts.slice(0, 40);
 }
-function getPosts(_a) {
-    return __awaiter(this, arguments, void 0, function* ({ page = 1, signal, providerContext }) {
-        try {
-            const { axios, cheerio } = providerContext;
-            const url = page > 1 ? `${BASE}/latest-updates/?page=${page}` : `${BASE}/latest-updates/`;
-            const res = yield axios.get(url, { headers: { "User-Agent": UA }, signal, timeout: 25000 });
-            return yield parseHtml(res.data, cheerio);
-        }
-        catch (_b) {
-            return [];
-        }
-    });
-}
-function getSearchPosts(_a) {
-    return __awaiter(this, arguments, void 0, function* ({ searchQuery, page = 1, signal, providerContext }) {
-        try {
-            const { axios, cheerio } = providerContext;
-            const url = `${BASE}/search/?q=${encodeURIComponent(searchQuery)}&page=${page || 1}`;
-            const res = yield axios.get(url, { headers: { "User-Agent": UA }, signal, timeout: 25000 });
-            return yield parseHtml(res.data, cheerio);
-        }
-        catch (_b) {
-            return [];
-        }
-    });
-}
+const getPosts = async function ({ page, signal, providerContext }) {
+    try {
+        const { axios, cheerio } = providerContext;
+        const url = page > 1 ? `${BASE}/latest-updates/?page=${page}` : `${BASE}/latest-updates/`;
+        const res = await axios.get(url, { headers: { "User-Agent": UA }, signal, timeout: 25000 });
+        return parse(res.data, cheerio);
+    }
+    catch (_a) {
+        return [];
+    }
+};
+exports.getPosts = getPosts;
+const getSearchPosts = async function ({ searchQuery, page, signal, providerContext }) {
+    try {
+        const { axios, cheerio } = providerContext;
+        const url = `${BASE}/search/?q=${encodeURIComponent(searchQuery)}&page=${page || 1}`;
+        const res = await axios.get(url, { headers: { "User-Agent": UA }, signal, timeout: 25000 });
+        return parse(res.data, cheerio);
+    }
+    catch (_a) {
+        return [];
+    }
+};
+exports.getSearchPosts = getSearchPosts;
